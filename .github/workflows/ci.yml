@@ -36,7 +36,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          UV_THREADPOOL_SIZE=$(($(nproc --all) - 1)) \
+          mkdir -p coverage && UV_THREADPOOL_SIZE=$(($(nproc --all) - 1)) \
           docker compose up --always-recreate-deps --build --force-recreate -d --wait
 
       - name: Run tests with coverage
