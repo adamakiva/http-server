@@ -1,0 +1,57 @@
+services:
+  http-server:
+    hostname: http-server
+    container_name: http-server
+    restart: unless-stopped
+    build:
+      target: server
+    user: ${UID}:${GID}
+    # Run the node process as PID 1
+    init: true
+    environment:
+      # Server options
+      - HTTP_SERVER_PORT=${HTTP_SERVER_PORT:-8226}
+      - HTTP_SERVER_DEBUG=${HTTP_SERVER_DEBUG:-0.0.0.0:8227}
+      - HTTP_SERVER_BASE_URL=${HTTP_SERVER_BASE_URL:-http://localhost}
+      - HTTP_SERVER_ROUTE=${HTTP_SERVER_ROUTE:-/api/v1}
+      - HTTP_SERVER_FORCE_CLOSE_TIMEOUT=${HTTP_SERVER_FORCE_CLOSE_TIMEOUT:-10000}
+
+      # Node server options
+      - HTTP_SERVER_MAX_HEADERS_COUNT=${HTTP_SERVER_MAX_HEADERS_COUNT:-64}
+      - HTTP_SERVER_HEADERS_TIMEOUT=${HTTP_SERVER_HEADERS_TIMEOUT:-8000}
+      - HTTP_SERVER_REQUEST_TIMEOUT=${HTTP_SERVER_REQUEST_TIMEOUT:-16000}
+      - HTTP_SERVER_TIMEOUT=${HTTP_SERVER_TIMEOUT:-60000}
+      - HTTP_SERVER_MAX_REQUESTS_PER_SOCKET=${HTTP_SERVER_MAX_REQUESTS_PER_SOCKET:-64}
+      - HTTP_SERVER_KEEP_ALIVE_TIMEOUT=${HTTP_SERVER_KEEP_ALIVE_TIMEOUT:-30000}
+
+      # Node runtime options
+      - NODE_ENV=${NODE_ENV:-production}
+      - NODE_MAX_SOCKETS=${NODE_MAX_SOCKETS:-512}
+      - NODE_MAX_TOTAL_SOCKETS=${NODE_MAX_TOTAL_SOCKETS:-4096}
+      - NODE_DEFAULT_HIGH_WATERMARK=${NODE_DEFAULT_HIGH_WATERMARK:-262144}
+      - NODE_PIPE_TIMEOUT=${NODE_PIPE_TIMEOUT:-16000}
+      - NODE_OPTIONS=${NODE_OPTIONS:- --stack-trace-limit=16 --force-node-api-uncaught-exceptions-policy --enable-source-maps --trace-uncaught --v8-pool-size=0 --max-semi-space-size=32}
+
+      # libuv options
+      - UV_THREADPOOL_SIZE=${UV_THREADPOOL_SIZE:-1}
+    volumes:
+      - ./:/home/node/server:rw
+      # See: https://docs.npmjs.com/cli/v6/using-npm/config#cache
+      - ./npm-cache:/home/node/.npm:rw
+      # See: https://stackoverflow.com/a/44440563
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8226:8226
+      - 8227:8227
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -o /dev/null -w '%{http_code}' http://localhost:8226/alive | grep -q '204' &&
+          curl -s -o /dev/null -w '%{http_code}' http://localhost:8226/ready | grep -q '204'"
+        ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 30s

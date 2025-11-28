@@ -1,0 +1,32 @@
+# Ignore everything
+*
+
+# Exclude folders from above rule
+!**/
+
+# Block previously allowed folders
+npm-cache/
+node_modules/
+
+# Exclude nested configuration
+!.github/workflows/ci.yml
+!.vscode/launch.json
+!scripts/init-server.sh
+!scripts/remove.sh
+!scripts/start.sh
+
+# Exclude source code
+!src/**/*.ts
+
+# Exclude configuration
+!.gitignore
+!.prettierrc.ts
+!compose.yml
+!Dockerfile
+!eslint.config.js
+!LICENSE
+!package.json
+!package-lock.json
+!README.md
+!tsconfig.json
+!tsconfig.prod.json

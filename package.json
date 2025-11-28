@@ -1,0 +1,50 @@
+{
+  "name": "http-server",
+  "version": "0.0.0",
+  "description": "Native http server",
+  "type": "module",
+  "main": "./src/main.ts",
+  "scripts": {
+    "test": "node --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-coverage-include='src/**/*.ts'",
+    "lint": "eslint 'src/**/*.ts'; tsc --project tsconfig.json",
+    "build": "eslint 'src/**/*.ts' && tsc --build --verbose tsconfig.prod.json"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/eslint-config-prettier": "^6.11.3",
+    "@types/eslint-plugin-security": "^3.0.0",
+    "@types/node": "24.10.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-security": "^3.0.1",
+    "eslint-plugin-unicorn": "^62.0.0",
+    "globals": "^16.5.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.0"
+  },
+  "author": "Adam Akiva",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adamakiva/http-server"
+  },
+  "bugs": {
+    "url": "https://github.com/adamakiva/http-server/issues"
+  },
+  "maintainers": [
+    {
+      "name": "Adam Akiva",
+      "email": "adam.akiva14@gmail.com",
+      "url": "https://github.com/adamakiva"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Adam Akiva",
+      "email": "adam.akiva14@gmail.com",
+      "url": "https://github.com/adamakiva"
+    }
+  ]
+}
