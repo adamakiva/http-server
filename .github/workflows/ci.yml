@@ -36,8 +36,7 @@ jobs:
           docker compose up --always-recreate-deps --build --force-recreate -d --wait
 
       - name: Run tests with coverage
-        run: |
-          docker compose exec -T http-server npm run test
+        run: UID=1000 GID=1000 docker compose exec -T http-server npm run test
 
       - name: Stop server and collect logs
         if: always()
