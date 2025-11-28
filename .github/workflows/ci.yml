@@ -26,6 +26,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-24.04
+    needs: lint
 
     steps:
       - name: Checkout code
@@ -40,7 +41,7 @@ jobs:
           docker compose up --always-recreate-deps --build --force-recreate -d --wait
 
       - name: Run tests with coverage
-        run: docker compose exec -T http-server npm run test
+        run: docker compose exec -T http-server npm run test:ci
 
       - name: Stop server and collect logs
         if: always()
@@ -52,11 +53,9 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           disable_search: true
-          flags: unittests
-          verbose: true
           fail_ci_if_error: false
         continue-on-error: true
-        if: always() && github.repository != 'private'
+        if: success() && github.repository != 'private'
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
@@ -64,4 +63,4 @@ jobs:
           name: coverage-report
           path: ./coverage
           retention-days: 30
-        if: always()
+        if: success()

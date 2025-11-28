@@ -6,7 +6,6 @@ GID=$(id -g);
 ROOT_DIR=$(realpath "$(dirname "$0")/..");
 
 NPM_CACHE_DIR="$ROOT_DIR"/npm-cache;
-COVERAGE_FOLDER="$ROOT_DIR/coverage";
 ERR_LOG_FILE="$ROOT_DIR"/error_logs.txt;
 
 UV_THREADPOOL_SIZE=$(($(nproc --all) - 1));
@@ -63,7 +62,7 @@ check_services_health() {
 
 main() {
     check_prerequisites &&
-    mkdir -p "$NPM_CACHE_DIR" "$COVERAGE_FOLDER" &&
+    mkdir -p "$NPM_CACHE_DIR" &&
     install_dependencies &&
     rm -f "$ERR_LOG_FILE" &&
     cd "$ROOT_DIR" &&
