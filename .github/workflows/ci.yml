@@ -37,7 +37,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          docker compose exec --no-tty http-server npm run test
+          docker compose exec -T http-server npm run test
 
       - name: Stop server and collect logs
         if: always()
