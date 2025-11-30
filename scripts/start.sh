@@ -66,7 +66,7 @@ main() {
     install_dependencies &&
     rm -f "$ERR_LOG_FILE" &&
     cd "$ROOT_DIR" &&
-    UID="$UID" GID="$GID" UV_THREADPOOL_SIZE="$UV_THREADPOOL_SIZE" docker compose up --always-recreate-deps --build --force-recreate -d --wait &&
+    UID="$UID" GID="$GID" UV_THREADPOOL_SIZE="$UV_THREADPOOL_SIZE" docker compose up --always-recreate-deps --build --force-recreate -d --wait http-server-development &&
     check_services_health;
 }
 

@@ -28,7 +28,7 @@ check_prerequisites() {
 main() {
     cd "$ROOT_DIR" || exit 1;
     check_prerequisites &&
-    UID="$UID" GID="$GID" UV_THREADPOOL_SIZE="$UV_THREADPOOL_SIZE" docker compose down || exit 1;
+    UID="$UID" GID="$GID" UV_THREADPOOL_SIZE="$UV_THREADPOOL_SIZE" docker compose rm -fsv http-server-development || exit 1;
 }
 
 ########################################################################################################

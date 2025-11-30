@@ -1,13 +1,7 @@
 services:
-  http-server:
-    hostname: http-server
-    container_name: http-server
-    restart: unless-stopped
+  http-server-base:
     build:
-      target: server
-    user: ${UID}:${GID}
-    # Run the node process as PID 1
-    init: true
+      target: development
     environment:
       # Http server options
       - HTTP_SERVER_PORT=${HTTP_SERVER_PORT:-8226}
@@ -34,6 +28,17 @@ services:
 
       # libuv options
       - UV_THREADPOOL_SIZE=${UV_THREADPOOL_SIZE:-1}
+
+  http-server-development:
+    hostname: http-server
+    container_name: http-server
+    restart: unless-stopped
+    build:
+      target: development
+    user: ${UID}:${GID}
+    # Run the node process as PID 1
+    init: true
+    extends: http-server-base
     volumes:
       - ./:/home/node/server:rw
       # See: https://docs.npmjs.com/cli/v6/using-npm/config#cache
@@ -55,3 +60,47 @@ services:
       timeout: 3s
       retries: 5
       start_period: 30s
+
+  http-server-production:
+    hostname: http-server
+    container_name: http-server
+    restart: unless-stopped
+    build:
+      target: production
+    user: ${UID}:${GID}
+    # Run the node process as PID 1
+    init: true
+    extends: http-server-base
+    volumes:
+      # See: https://stackoverflow.com/a/44440563
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8226:8226
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -o /dev/null -w '%{http_code}' http://localhost:8226/alive | grep -q '204' &&
+          curl -s -o /dev/null -w '%{http_code}' http://localhost:8226/ready | grep -q '204'"
+        ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+  http-server-nginx:
+    hostname: http-server-nginx
+    container_name: http-server-nginx
+    restart: unless-stopped
+    build:
+      target: nginx
+    volumes:
+      # See: https://stackoverflow.com/a/44440563
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8226:443
+    depends_on:
+      http-server-production:
+        condition: service_healthy
