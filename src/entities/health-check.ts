@@ -1,14 +1,14 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
-import type { Context } from '../router/path-rule.ts';
-import { STATUS_CODES } from '../utilities/constants.ts';
+import { STATUS_CODES } from '../utilities/configuration.ts';
+import type { Context } from '../utilities/types.ts';
 
 /******************************************************************************************************/
 
 function healthCheck(parameters: {
   request: IncomingMessage;
-  context: Context;
   response: ServerResponse;
+  context: Context;
 }) {
   const { response } = parameters;
 

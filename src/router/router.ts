@@ -1,18 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { type URLPatternOptions, URLPattern } from 'node:url';
 
-/******************************************************************************************************/
-
-type Context = {
-  [key in keyof Omit<URLPatternResult, 'inputs'>]: { [key: string]: string | undefined };
-};
+import type { Context } from '../utilities/types.ts';
 
 /******************************************************************************************************/
 
-class PatternParser<
-  Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse,
-> {
+class PathRule {
   readonly #method;
   readonly #pattern;
   readonly #handler;
@@ -23,9 +16,9 @@ class PatternParser<
     baseUrl?: string;
     options?: URLPatternOptions;
     handler: (parameters: {
-      request: Request;
+      request: IncomingMessage;
+      response: ServerResponse;
       context: Context;
-      response: Response;
     }) => void | Promise<void>;
   }) {
     const { method, pattern, baseUrl, options = { ignoreCase: false }, handler } = parameters;
@@ -69,6 +62,35 @@ class PatternParser<
   }
 }
 
+class Router {
+  readonly #routes: PathRule[];
+
+  public constructor() {
+    this.#routes = [];
+  }
+
+  public register(patternRule: ConstructorParameters<typeof PathRule>[0]) {
+    const rule = new PathRule(patternRule);
+    this.#routes.push(rule);
+
+    return this;
+  }
+
+  public find(url: string, method: string) {
+    for (const route of this.#routes) {
+      const patternResult = route.match(url, method);
+      if (patternResult) {
+        return {
+          route,
+          patternResult,
+        } as const;
+      }
+    }
+
+    return undefined;
+  }
+}
+
 /******************************************************************************************************/
 
-export { PatternParser, type Context };
+export { Router };

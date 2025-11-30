@@ -19,6 +19,7 @@ function forceShutdown(server: HttpServer) {
 
 function shutdown(server: HttpServer, forceCloseTimeout: number) {
   setTimeout(forceShutdown, forceCloseTimeout, server).unref();
+
   server.close();
   process.exitCode = 0;
 }

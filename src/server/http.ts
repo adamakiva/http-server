@@ -1,8 +1,9 @@
 import { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 
-import { createRouter } from '../routes/router.ts';
 import type { EnvironmentVariables } from '../utilities/configuration.ts';
+
+import { createRouter } from '../router/index.ts';
 
 /******************************************************************************************************/
 
@@ -14,6 +15,7 @@ type Configuration = Pick<
   | 'timeout'
   | 'maxRequestsPerSocket'
   | 'keepAliveTimeout'
+  | 'keepAliveTimeoutBuffer'
 >;
 
 /******************************************************************************************************/
@@ -68,6 +70,7 @@ class HttpServer extends Server {
       timeout,
       maxRequestsPerSocket,
       keepAliveTimeout,
+      keepAliveTimeoutBuffer,
     } = configuration;
 
     // Every configuration referring to sockets here, talks about network/tcp
@@ -89,6 +92,7 @@ class HttpServer extends Server {
     // As for a good number, it depends on the application traffic
     this.maxRequestsPerSocket = maxRequestsPerSocket;
     this.keepAliveTimeout = keepAliveTimeout;
+    this.keepAliveTimeoutBuffer = keepAliveTimeoutBuffer;
 
     return this;
   }

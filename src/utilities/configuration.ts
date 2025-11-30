@@ -1,26 +1,39 @@
-import { globalAgent } from 'node:http';
+import { globalAgent, STATUS_CODES as HTTP_STATUS_CODES } from 'node:http';
 import Stream from 'node:stream';
 
 /******************************************************************************************************/
 
 type EnvironmentVariables = ReturnType<ConfigurationManager['getEnvVariables']>;
 
+/******************************************************************************************************/
+
 const REQUIRED_ENVIRONMENT_VARIABLES = [
   'HTTP_SERVER_PORT',
   'HTTP_SERVER_BASE_URL',
   'HTTP_SERVER_ROUTE',
+
   'HTTP_SERVER_MAX_HEADERS_COUNT',
   'HTTP_SERVER_HEADERS_TIMEOUT',
   'HTTP_SERVER_REQUEST_TIMEOUT',
   'HTTP_SERVER_TIMEOUT',
   'HTTP_SERVER_MAX_REQUESTS_PER_SOCKET',
   'HTTP_SERVER_KEEP_ALIVE_TIMEOUT',
+  'HTTP_SERVER_KEEP_ALIVE_TIMEOUT_BUFFER',
   'HTTP_SERVER_FORCE_CLOSE_TIMEOUT',
+
   'NODE_MAX_SOCKETS',
   'NODE_MAX_TOTAL_SOCKETS',
   'NODE_DEFAULT_HIGH_WATERMARK',
   'NODE_PIPE_TIMEOUT',
 ] as const;
+
+const STATUS_CODES: { [key: number]: [number, string] } = {};
+Object.entries(HTTP_STATUS_CODES).forEach((entry) => {
+  const code = Number(entry[0]);
+  const status = entry[1]!;
+
+  STATUS_CODES[code] = [code, status];
+});
 
 /******************************************************************************************************/
 
@@ -55,6 +68,10 @@ class ConfigurationManager {
         keepAliveTimeout: this.#toNumber(
           'HTTP_SERVER_KEEP_ALIVE_TIMEOUT',
           process.env.HTTP_SERVER_KEEP_ALIVE_TIMEOUT,
+        ),
+        keepAliveTimeoutBuffer: this.#toNumber(
+          'HTTP_SERVER_KEEP_ALIVE_TIMEOUT_BUFFER',
+          process.env.HTTP_SERVER_KEEP_ALIVE_TIMEOUT_BUFFER,
         ),
         forceCloseTimeout: this.#toNumber(
           'HTTP_SERVER_FORCE_CLOSE_TIMEOUT',
@@ -127,4 +144,4 @@ class ConfigurationManager {
 
 /******************************************************************************************************/
 
-export { ConfigurationManager, type EnvironmentVariables };
+export { ConfigurationManager, STATUS_CODES, type EnvironmentVariables };
