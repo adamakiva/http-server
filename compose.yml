@@ -75,8 +75,6 @@ services:
       # See: https://stackoverflow.com/a/44440563
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-    ports:
-      - 8226:8226
     healthcheck:
       test:
         [
@@ -100,7 +98,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - 8226:443
+      - 443:443
     depends_on:
       http-server-production:
         condition: service_healthy

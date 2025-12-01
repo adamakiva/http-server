@@ -6,6 +6,7 @@ GID=$(id -g);
 ROOT_DIR=$(realpath "$(dirname "$0")/..");
 
 NPM_CACHE_DIR="$ROOT_DIR"/npm-cache;
+CERTS_DIR="$ROOT_DIR"/nginx/certs;
 ERR_LOG_FILE="$ROOT_DIR"/error_logs.txt;
 
 UV_THREADPOOL_SIZE=$(($(nproc --all) - 1));
@@ -33,6 +34,17 @@ install_dependencies() {
     if ! npm install --include=dev -d; then
         printf "\nFailed to install npm dependencies. Please check for issues and try again.\n\n";
         exit 1;
+    fi
+}
+
+generate_certs() {
+    if [ ! -d "$CERTS_DIR" ]; then
+        mkdir "$CERTS_DIR" || exit 1;
+
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout "$CERTS_DIR"/selfsigned.key \
+        -out "$CERTS_DIR"/selfsigned.crt \
+        -subj "/C=US/ST=Test/L=Local/O=Dev/OU=Test/CN=localhost" || exit 1;
     fi
 }
 
@@ -64,6 +76,7 @@ main() {
     check_prerequisites &&
     mkdir -p "$NPM_CACHE_DIR" &&
     install_dependencies &&
+    generate_certs &&
     rm -f "$ERR_LOG_FILE" &&
     cd "$ROOT_DIR" &&
     UID="$UID" GID="$GID" UV_THREADPOOL_SIZE="$UV_THREADPOOL_SIZE" docker compose up --always-recreate-deps --build --force-recreate -d --wait http-server-development &&

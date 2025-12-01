@@ -26,11 +26,14 @@ ARG NODE_BASE_DIRECTORY
 
 WORKDIR ${NODE_BASE_DIRECTORY}
 
-RUN npm ci \
+COPY eslint.config.js package*.json tsconfig*.json .
+COPY src src/
+
+RUN npm clean-install \
     && npm run lint \
     && npm run build \
     && rm -rf dist/tsconfig.prod.tsbuildinfo \
-    && npm ci --omit=dev
+    && npm clean-install --omit=dev
 
 FROM "$NODE_IMAGE_REPO":"$NODE_IMAGE_TAG" AS production
 
@@ -43,13 +46,13 @@ COPY --from=build ${NODE_BASE_DIRECTORY}/package*.json .
 COPY --from=build ${NODE_BASE_DIRECTORY}/dist dist/
 COPY --from=build ${NODE_BASE_DIRECTORY}/node_modules node_modules/
 
-CMD ["node dist/main.js"]
+CMD ["node", "dist/main.js"]
 
 ########################################################################################################
 
 FROM "${NGINX_IMAGE_REPO}":"${NGINX_IMAGE_TAG}" AS nginx
 USER nginx
 
-COPY --chown=nginx ./nginx /etc/nginx
+COPY --chown=nginx nginx /etc/nginx/
 
 CMD ["nginx", "-g", "daemon off;"]
